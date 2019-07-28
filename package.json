@@ -1,0 +1,19 @@
+{
+  "name": "yuyinjiexi",
+  "version": "1.0.0",
+  "description": "Hello world new project template.",
+  "main": "server.js",
+  "dependencies": {
+    "browser-sync": "^2.26.7",
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^0.19.1",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
