@@ -2,6 +2,7 @@ var AudioRecorderV2 = require('AudioRecorderV2');
 var HttpUtil = require('HttpUtil');
 var TextViewManager = require('TextViewManager');
 var NaoZhongManager = require('NaoZhongManager');
+var LaJiFenLeiManager = require('LaJiFenLeiManager');
 cc.Class({
     extends: cc.Component,
 
@@ -17,9 +18,9 @@ cc.Class({
 		textEdit:cc.EditBox,
 		//-------以下场景对象数据----------//
 		defaultScene:'LaJiFenLei',	//当前的场景
-		onprocess:null,				//数据处理函数
 		recorder:null,				//录音对象句柄
 		naozhongMager:null,			//闹钟对象句柄
+		ljflMager:null,				//垃圾分类对象句柄
 		defaultInput:'Text',
 		inputButton:cc.Node,
 		//场景节点
@@ -59,6 +60,11 @@ cc.Class({
 		this.tvManager = new TextViewManager(this.scrollView);
 		this.tvManager.initialize();
 		//this.customScreenAdapt();
+		this.switchScene();
+		this.sceneMap = {
+			NaoZhong:'Alarm',
+			LaJiFenLei:'LJFL'
+		}
     },
 	//用于切换输入UI控制 语音或者汉字
 	switchInput:function(event){
@@ -86,18 +92,19 @@ cc.Class({
 				if(this.defaultScene == 'NaoZhong'){
 					if(this.naozhongMager == null){
 						this.naozhongMager = new NaoZhongManager(this.myScene[i]);
+						this.naozhongMager.initialize();
 					}
-					this.onprocess = this.naozhongMager.onprocess;
+				}else if(this.defaultScene == 'LaJiFenLei'){
+					if(this.ljflMager == null){
+						this.ljflMager = new LaJiFenLeiManager(this.myScene[i]);
+						this.ljflMager.initialize();
+					}
 				}
 			}else{
 				this.myScene[i].active = false;
 			}
 		}
 	},
-	// called every frame
-    update: function (dt) {
-
-    },
 	openSceneSelect:function(){
 		console.log()
 		var self = this;
@@ -150,10 +157,11 @@ cc.Class({
 		this.textStr = instr;
 	},
 	eidtEnd:function(event){
-		this.tvManager.addText(this.textStr,'LEFT');
+		//this.tvManager.addText(this.textStr,'LEFT');
 	},
 	eidtReturn:function(event){
 		this.tvManager.addText(this.textStr,'LEFT');
+		this.updateText(this.textStr);
 	},
 	recOpen:function(){
 		console.log('recOpen');
@@ -191,10 +199,35 @@ cc.Class({
 					console.log('recg',e);
 					if(e != null){
 						self.textStr = e;
-						self.tvManager.addText(this.textStr,'RIGHT');
+						self.tvManager.addText(self.textStr,'LEFT');
+						self.updateText(self.textStr);
 					}
 					break;
             }
+        });
+	},
+	/*上传数据到语义解析引擎*/
+	updateText(text){
+		var self = this;
+		var data = {
+			text:text,
+			scene:this.sceneMap[this.defaultScene]
+		};
+		HttpUtil.postJson('/text',JSON.stringify(data),function (state, e) {
+			if(e != null){
+				var res = JSON.parse(e);
+				if(res.result != null && res.result.msg != null){
+					self.textStr = res.result.msg;
+					self.tvManager.addText(self.textStr,'RIGHT');
+					if(self.defaultScene == 'NaoZhong'){
+						self.naozhongMager.onprocess(res);
+					}else if(self.defaultScene == 'LaJiFenLei'){
+						self.ljflMager.onprocess(res);
+					}else{
+						console.log(res);
+					}
+				}
+			}
         });
 	},
 	customScreenAdapt(){

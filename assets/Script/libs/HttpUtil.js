@@ -48,12 +48,25 @@ var HttpUtil = HttpUtil || {
 		};
 		xhr.send(null);
 	},
-
+	postJson:function(url,data, callback){
+		var xhr = cc.loader.getXMLHttpRequest();
+		xhr.open("POST", url);
+		xhr.setRequestHeader("Content-Type","application/json");
+		if (callback) {
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 207)) {
+					callback(200,xhr.responseText);
+				}else{
+					callback(201,null);
+				}
+			};
+		}
+		xhr.send(data);
+	},
 	post:function(url,data,cb){
 		var xhr = cc.loader.getXMLHttpRequest();
 		xhr.open("POST", url);
-		xhr.setRequestHeader("Content-Type","audio/pcm;rate=16000");
-		xhr.setRequestHeader("Content-Length",data.byteLength);
+		xhr.setRequestHeader("Content-Type","application/json");
 		xhr.onreadystatechange = function () {
 			console.log('post',xhr.status);
 			if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 207)) {            

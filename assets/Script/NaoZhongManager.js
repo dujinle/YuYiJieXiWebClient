@@ -16,21 +16,40 @@ class NaoZhongManager {
 		this.pmLayout = this.pmLayout || this.viewUI.getChildByName('pmLayout');
 		if(this.amList.length > 0){
 			let lastid = this.amList.length - 1;
-			this.amLayout.getChildByName('amitem1').getComponent(cc.Label).string = this.amList[lastid].join('|');
+			this.amLayout.getChildByName('amitem1').getComponent(cc.Label).string = this.amList[lastid];
 			if(lastid - 1 >= 0){
-				this.amLayout.getChildByName('amitem2').getComponent(cc.Label).string = this.amList[lastid - 1].join('|');
+				this.amLayout.getChildByName('amitem2').getComponent(cc.Label).string = this.amList[lastid - 1];
 			}
 		}
 		if(this.pmList.length > 0){
 			let lastid = this.pmList.length - 1;
-			this.pmLayout.getChildByName('pmitem1').getComponent(cc.Label).string = this.pmList[lastid].join('|');
+			this.pmLayout.getChildByName('pmitem1').getComponent(cc.Label).string = this.pmList[lastid];
 			if(lastid - 1 >= 0){
-				this.pmLayout.getChildByName('pmitem2').getComponent(cc.Label).string = this.pmList[lastid - 1].join('|');
+				this.pmLayout.getChildByName('pmitem2').getComponent(cc.Label).string = this.pmList[lastid - 1];
 			}
 		}
 	}
 	onprocess(data){
 		console.log(data);
+		if(data.mcks){
+			this.amList = [];
+			this.pmList = [];
+			for(var key in data.mcks){
+				var item = data.mcks[key];
+				if(item.time){
+					var hour = item.time.split(':')[0];
+					if(hour <= 12){
+						this.amList.push(key + '|' + item.time);
+					}else{
+						this.pmList.push(key + '|' + item.time);
+					}
+				}
+				if(key == '起床'){
+					this.curTime = key + '|' + item.time;
+				}
+			}
+		}
+		this.initialize();
 	}
 }
 module.exports = NaoZhongManager;
