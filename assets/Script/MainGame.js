@@ -1,4 +1,5 @@
 var AudioRecorderV2 = require('AudioRecorderV2');
+var BaiDuTTS = require('BaiDuTTS');
 var HttpUtil = require('HttpUtil');
 var TextViewManager = require('TextViewManager');
 var NaoZhongManager = require('NaoZhongManager');
@@ -16,6 +17,7 @@ cc.Class({
 		voiceInput:cc.Node,
 		textInput:cc.Node,
 		textEdit:cc.EditBox,
+		videoPlayer:cc.Node,
 		//-------以下场景对象数据----------//
 		defaultScene:'LaJiFenLei',	//当前的场景
 		recorder:null,				//录音对象句柄
@@ -65,6 +67,7 @@ cc.Class({
 			NaoZhong:'Alarm',
 			LaJiFenLei:'LJFL'
 		}
+		this.btts = new BaiDuTTS(this.videoPlayer);
     },
 	//用于切换输入UI控制 语音或者汉字
 	switchInput:function(event){
@@ -218,6 +221,9 @@ cc.Class({
 				var res = JSON.parse(e);
 				if(res.result != null && res.result.msg != null){
 					self.textStr = res.result.msg;
+					if(self.btts != null){
+						self.btts.tts(self.textStr);
+					}
 					self.tvManager.addText(self.textStr,'RIGHT');
 					if(self.defaultScene == 'NaoZhong'){
 						self.naozhongMager.onprocess(res);

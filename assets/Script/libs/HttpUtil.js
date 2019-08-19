@@ -2,31 +2,55 @@ var HttpUtil = HttpUtil || {
 	//上传
     upload:function (url,data, callback) {
 		var xhr = cc.loader.getXMLHttpRequest();
-		if (callback) {
-			xhr.upload.addEventListener("progress", function (e) {
-				callback('uploading', e);
-			}, false);
-			xhr.addEventListener("load", function (e) {
-				callback('ok', e);
-			}, false);
-			xhr.addEventListener("error", function (e) {
-				callback('error', e);
-			}, false);
-			xhr.addEventListener("abort", function (e) {
-				callback('cancel', e);
-			}, false);
-		
-			xhr.onreadystatechange = function () {
-				if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 207)) {
-					callback('recg',xhr.responseText);
-				}else{
-					callback('recg',null);
-				}
-			};
-		}
-		xhr.open("POST", url);
-		xhr.send(data);
+		this.get_token(function(token){
+			if (callback) {
+				xhr.upload.addEventListener("progress", function (e) {
+					callback('uploading', e);
+				}, false);
+				xhr.addEventListener("load", function (e) {
+					callback('ok', e);
+				}, false);
+				xhr.addEventListener("error", function (e) {
+					callback('error', e);
+				}, false);
+				xhr.addEventListener("abort", function (e) {
+					callback('cancel', e);
+				}, false);
+			
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 207)) {
+						callback('recg',xhr.responseText);
+					}else{
+						callback('recg',null);
+					}
+				};
+			}
+			xhr.open("POST", url + '?token=' + token);
+			xhr.send(data);
+		});
     },
+	get_token:function(cb){
+		let storage = cc.sys.localStorage.getItem('localData');
+		if(storage != null){
+			let localData = JSON.parse(storage);
+			let time = new Date().getTime();
+			if(time - localData.refesh_time >= localData.expires_in){
+				this.get('/get_token',null,function(code,res){
+					res['refesh_time'] = new Date().getTime();
+					cc.sys.localStorage.setItem('localData',JSON.stringify(res));
+					cb(res.access_token);
+				})
+			}else{
+				cb(localData.access_token);
+			}
+		}else{
+			this.get('/get_token',null,function(code,res){
+				res['refesh_time'] = new Date().getTime();
+				cc.sys.localStorage.setItem('localData',JSON.stringify(res));
+				cb(res.access_token);
+			})
+		}
+	},
 	get:function(url,param,cb){
 		var xhr = cc.loader.getXMLHttpRequest();
 		//var xhr = new XMLHttpRequest();

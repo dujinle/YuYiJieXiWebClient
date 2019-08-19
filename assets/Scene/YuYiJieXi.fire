@@ -47,8 +47,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.258490707810664,
-      "y": 0.258490707810664,
+      "x": 0.42578125,
+      "y": 0.42578125,
       "z": 1
     },
     "_quat": {
@@ -4218,6 +4218,7 @@
     "textEdit": {
       "__id__": 49
     },
+    "videoPlayer": null,
     "defaultScene": "LaJiFenLei",
     "recorder": null,
     "naozhongMager": null,

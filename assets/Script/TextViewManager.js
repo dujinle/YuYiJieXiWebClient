@@ -42,7 +42,7 @@ class TextViewManager {
 			width:560,
 			height:height
 		});
-		console.log(this.textList);
+		//console.log(this.textList);
 		this.curNum += 1;
 		this.viewUI.getComponent('ScrollView').setInitData(this.textList);
 	}

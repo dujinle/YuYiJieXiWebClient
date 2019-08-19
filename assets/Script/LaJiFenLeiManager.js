@@ -21,7 +21,7 @@ class LaJiFenLeiManager {
 		this.prefab = this.prefab || this.viewUI.getChildByName('lajilabel');
 	}
 	onprocess(data){
-		console.log(data);
+		//console.log(data);
 		if(data.result){
 			if(data.result.action == 'throw'){
 				for(var i = 0;i < data.result.objs.length;i++){

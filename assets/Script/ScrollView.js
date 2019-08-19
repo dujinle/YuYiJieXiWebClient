@@ -38,7 +38,7 @@ cc.Class({
 			this.content.height += height;
 		}
 		this.content.y = 0;
-		console.log(this.content.height,this.totalCount);
+		//console.log(this.content.height,this.totalCount);
 		this.view.height = this.content.height > 800 ?800:this.content.height;
 		var lasty = 0;
     	for (let i = 0; i < this.spawnCount; i++) { // spawn items, we only need to do this once
@@ -61,7 +61,7 @@ cc.Class({
             this.items.push(item);
 			lasty += height;
     	}
-		console.log(this.content.y);
+		//console.log(this.content.y);
     },
 
 	//获取服务器上的残局数据

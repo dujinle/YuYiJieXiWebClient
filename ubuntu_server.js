@@ -27,12 +27,11 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extende:true}));
 
 app.post('/voice', function (req, res) {
-    /*  form.parse(req, function(err, fields, files) {
-     config(files)
-     });*/
     var buffer = '';
     var chunks = [];
     var size = 0;
+	console.log(req);
+	var token = req.query['token'];
     req.on('data', function (chunk) {
         chunks.push(chunk);
         size += chunk.length;
@@ -64,7 +63,7 @@ app.post('/voice', function (req, res) {
 				console.log('wirte success');
 			}
 		});
-        config(res, data);
+        config(res, data,token);
     });
 });
 
@@ -91,13 +90,53 @@ app.post('/text', function (req, res) {
 	request(option2, callback)
 });
 
+
 var request = require('request');
 var APP_ID = "16883004";
 var API_KEY = "gyg2xqmDFzg3Svb1fFLbUuTE";
 var SECRET_KEY = "6fG1C428KU9bPSYpqoU1739fKWz5LDmn";
 var accessToken, result;
 var cuid = 'mymacbookpromacaddress';
-var config = function (res, bufData, socket) {
+
+app.get('/get_token',function(req,res){
+	var option1 = {
+        url: `https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id=${API_KEY}&client_secret=${SECRET_KEY}`,
+        method: 'GET',
+        json: true
+    };
+	request(option1, function(err,response,data){
+		 if (!err && data) {
+			 res.send(data);
+		 }
+	});
+});
+
+var config = function (res, bufData, token) {
+	let option2 = {
+		headers: {
+			'Content-Type': 'audio/wav; rate=16000',
+			'Content-Length': bufData.length
+		},
+		url: `http://vop.baidu.com/pro_api?dev_pid=80001&cuid=${cuid}&token=${token}`,
+		method: "POST",
+		json: true,
+		formData: {
+			my_buffer: bufData
+		}
+	};
+
+	function callback2(err, response, data) {
+		console.log(err,data);
+		if (!err && data) {
+			result = data && data.result||[];
+			html = result.join();
+			res.send(html);
+		}
+	}
+	request(option2, callback2)
+};
+/*
+var config = function (res, bufData, token) {
     var option1 = {
         url: `https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id=${API_KEY}&client_secret=${SECRET_KEY}`,
         method: 'GET',
@@ -113,7 +152,7 @@ var config = function (res, bufData, socket) {
                     'Content-Type': 'audio/wav; rate=16000',
                     'Content-Length': bufData.length
                 },
-                url: `http://vop.baidu.com/pro_api?dev_pid=80001&cuid=${cuid}&token=${accessToken}`,
+                url: `http://vop.baidu.com/pro_api?dev_pid=80001&cuid=${cuid}&token=${token}`,
                 method: "POST",
                 json: true,
                 formData: {
@@ -137,3 +176,4 @@ var config = function (res, bufData, socket) {
     request(option1, callback1);
 
 };
+*/
