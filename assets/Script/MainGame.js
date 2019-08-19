@@ -61,7 +61,7 @@ cc.Class({
 		});
 		this.tvManager = new TextViewManager(this.scrollView);
 		this.tvManager.initialize();
-		//this.customScreenAdapt();
+		this.customScreenAdapt();
 		this.switchScene();
 		this.sceneMap = {
 			NaoZhong:'Alarm',
@@ -163,13 +163,15 @@ cc.Class({
 		//this.tvManager.addText(this.textStr,'LEFT');
 	},
 	eidtReturn:function(event){
+		this.btts.init();
 		this.tvManager.addText(this.textStr,'LEFT');
 		this.updateText(this.textStr);
 	},
 	recOpen:function(){
 		console.log('recOpen');
-		this.voiceInput.opacity = 200;
+		this.voiceInput.opacity = 180;
 		this.recorder.start();
+		this.btts.init();
 	},
 	recCancel:function(){
 		console.log('recCancel');

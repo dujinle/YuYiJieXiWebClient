@@ -16,12 +16,26 @@ var HttpUtil = require('HttpUtil');
 'use strict';
 class BaiDuTTS {
 	constructor(videoPlayer) {
-		this.audio = null;
 		var self = this;
+		this.isPlay = false;
+		this.audio = document.getElementById('audio');
+		if(!this.audio){
+			this.audio = document.createElement('audio');
+		}
 		this.access_token = null;
 		HttpUtil.get_token(function(token){
 			self.access_token = token;
 		});
+	}
+	init(){
+		//防止iphone无法播放的问题，初始化就一直播放,播放什么鬼 不知道
+		//就是要一直播放
+		if(this.isPlay == false){
+			console.log('init for audio play');
+			this.isPlay = true;
+			this.audio.src = null;
+			this.audio.play();
+		}
 	}
 	
 	tts(stext){
@@ -53,11 +67,6 @@ class BaiDuTTS {
 		var opt = options || {};
 		if(this.access_token == null){
 			this.isFunction(opt.onError) && opt.onError("无效的token");
-		}
-		// 如果浏览器支持，可以设置autoplay，但是不能兼容所有浏览器
-		this.audio = document.getElementById('audio');
-		if(!this.audio){
-			this.audio = document.createElement('audio');
 		}
 		if (opt.autoplay) {
 			this.audio.setAttribute('autoplay', 'autoplay');
@@ -123,7 +132,7 @@ class BaiDuTTS {
 					if (xhr.response.type === 'audio/mp3') {
 						console.log('xhr.response.type',xhr.response.type);
 						// 在body元素下apppend音频控件
-						document.body.append(self.audio);
+						//document.body.append(self.audio);
 						
 						//audio = self.videoPlayer.getComponent(cc.VideoPlayer);
 						//audio.remoteURL = URL.createObjectURL(xhr.response);
@@ -133,11 +142,13 @@ class BaiDuTTS {
 						
 						if (opt.autoDestory) {
 							self.audio.onended = function() {
-								document.body.removeChild(self.audio);
+								self.audio.pause();
+								self.audio.src = null;
+								self.isPlay = false;
 							}
 						}
-						self.audio.play();
-						//self.isFunction(opt.onSuccess) && opt.onSuccess(self.audio);
+						//self.audio.play();
+						self.isFunction(opt.onSuccess) && opt.onSuccess(self.audio);
 					}
 
 					// 用来处理错误
